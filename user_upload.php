@@ -22,6 +22,13 @@ if (in_array('--help', $argv)) {
 		if (SQL::$conn) {
 			echo 'Successfully connected to DB';
 		}
+	} else {
+		$requiredFlags = [];
+		isset($mysqlHost) ? null : $requiredFlags[] = 'Host name (-h flag)';
+		isset($username) ? null : $requiredFlags[] = 'Username (-u flag)';
+		isset($password) ? null : $requiredFlags[] = 'Password (-p flag)';
+		$missingStr = implode(', ', $requiredFlags) . ' are required.';
+		echo $missingStr;
 	}
 }
 echo "\n";
