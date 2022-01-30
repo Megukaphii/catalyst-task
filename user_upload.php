@@ -18,9 +18,16 @@ if (in_array('--help', $argv)) {
 	include(__DIR__ . '/help.php');
 } else {
 	if (isset($mysqlHost) && isset($username) && isset($password)) {
-		SQL::create_db_connection($mysqlHost, $username, $password);
-		if (SQL::$conn) {
-			echo 'Successfully connected to DB';
+		try {
+			$sql = new SQL($mysqlHost, $username, $password);
+			
+			if ($sql->get_db_connection_success()) {
+				echo "Successfully connected to DB\n";
+			}
+		} catch (TypeError $e) {
+			echo '[TypeError]: An error occured, please try again later or contact support staff';
+		} catch (Throwable $e) {
+			echo '[' . get_class($e) . ', ' . $e->getCode() . ']: ' . $e->getMessage();
 		}
 	} else {
 		$requiredFlags = [];
