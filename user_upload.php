@@ -30,6 +30,7 @@ if (in_array('--help', $argv)) {
 
 				if (in_array('--create_table', $argv)) {
 					Utils::create_table($sql);
+					echo "Successfully created table\n";
 				}
 
 				if ($fileIdx = array_search('--file', $argv) + 1) {
@@ -38,11 +39,19 @@ if (in_array('--help', $argv)) {
 						try {
 							// Could use first row of usersData to get column names, but that would be wildly insecure
 							$query = 'INSERT INTO users(name, surname, email) VALUES (?, ?, ?)';
-							$params = $usersData[$i];
-							$sql->return_none($query, $params);
-							echo 'Successfully added row: ' . implode(', ', $usersData[$i]) . "\n";
-						} catch (PDOException $e) {
-							if ($e->getCode() == 23000) {
+							// $usersData[$i] structure is [name, surname, email]
+							$name = ucfirst(strtolower(trim($usersData[$i][0])));
+							$surname = ucfirst(strtolower(trim($usersData[$i][1])));
+							$email = trim($usersData[$i][2]);
+							if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+								$params = [$name, $surname, $email];
+								$sql->return_none($query, $params);
+								echo 'Successfully added row: ' . implode(', ', $params) . "\n";
+							} else {
+								throw new Exception('Invalid email address: ' . $email, 1);
+							}
+						} catch (Exception $e) {
+							if (get_class($e) == 'PDOException' && $e->getCode() == 23000) {
 								echo '[' . get_class($e) . ', ' . $e->getCode() . ']: Duplicate email address at row ' . $i . "\n";
 							} else {
 								echo '[' . get_class($e) . ', ' . $e->getCode() . ']: ' . $e->getMessage() . ' at row ' . $i ."\n";
