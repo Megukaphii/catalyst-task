@@ -63,21 +63,7 @@ if ($displayHelp) {
 					fwrite(STDOUT, "Opened file\n");
 					for ($i = 1; $i < count($usersData); $i++) {
 						try {
-							// Could use first row of usersData to get column names, but that would be wildly insecure
-							$query = 'INSERT INTO users(name, surname, email) VALUES (?, ?, ?)';
-							// $usersData[$i] structure is [name, surname, email]
-							$name = ucfirst(strtolower(trim($usersData[$i][0])));
-							$surname = ucfirst(strtolower(trim($usersData[$i][1])));
-							$email = trim($usersData[$i][2]);
-							if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-								$params = [$name, $surname, $email];
-								if (!$dryRun) {
-									$sql->return_none($query, $params);
-								}
-								fwrite(STDOUT, 'Successfully added row: ' . implode(', ', $params) . "\n");
-							} else {
-								throw new Exception('Invalid email address: ' . $email, 1);
-							}
+							write_row_to_users_table($usersData, $i);
 						} catch (Exception $e) {
 							if (get_class($e) == 'PDOException') {
 								if ($e->getCode() == 23000) {
