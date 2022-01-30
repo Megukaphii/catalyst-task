@@ -33,17 +33,11 @@ if (in_array('--help', $argv)) {
 				}
 
 				if ($fileIdx = array_search('--file', $argv) + 1) {
-					if (($csvHandle = fopen($argv[$fileIdx], 'r')) !== FALSE) {
-						echo "Opened file\n";
-						$userData = [];
-						while (($csvData = fgetcsv($csvHandle, 0, "\t")) !== FALSE) {
-							$userData[] = $csvData;
-						}
-						fclose($csvHandle);
-						echo print_r($userData, true);
-					} else {
-						echo 'Failed to open file';
-					}
+					$usersData = Utils::get_csv_data($argv[$fileIdx]);
+					echo print_r($usersData, true);
+					/*for ($i = 1; $i < count($usersData); $i++) {
+						$query = 'INSERT INTO users(';
+					}*/
 				}
 			}
 		} catch (TypeError $e) {
