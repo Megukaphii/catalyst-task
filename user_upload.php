@@ -8,14 +8,14 @@ require_once(__DIR__ . '/sql.php');
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/utils.php');
 
-if ($mysqlHostIdx = array_search('-h', $argv)) {
-	$mysqlHost = $argv[$mysqlHostIdx + 1];
+if ($mysqlHostIdx = array_search('-h', $argv) + 1) {
+	$mysqlHost = $argv[$mysqlHostIdx];
 }
-if ($usernameIdx = array_search('-u', $argv)) {
-	$username = $argv[$usernameIdx + 1];
+if ($usernameIdx = array_search('-u', $argv) + 1) {
+	$username = $argv[$usernameIdx];
 }
-if ($passwordIdx = array_search('-p', $argv)) {
-	$password = $argv[$passwordIdx + 1];
+if ($passwordIdx = array_search('-p', $argv) + 1) {
+	$password = $argv[$passwordIdx];
 }
 
 if (in_array('--help', $argv)) {
@@ -26,9 +26,24 @@ if (in_array('--help', $argv)) {
 			$sql = new SQL($mysqlHost, $username, $password);
 
 			if ($sql->get_db_connection_success()) {
-				echo 'Successfully connected to DB';
+				echo "Successfully connected to DB\n";
+
 				if (in_array('--create_table', $argv)) {
 					Utils::create_table($sql);
+				}
+
+				if ($fileIdx = array_search('--file', $argv) + 1) {
+					if (($csvHandle = fopen($argv[$fileIdx], 'r')) !== FALSE) {
+						echo "Opened file\n";
+						$userData = [];
+						while (($csvData = fgetcsv($csvHandle, 0, "\t")) !== FALSE) {
+							$userData[] = $csvData;
+						}
+						fclose($csvHandle);
+						echo print_r($userData, true);
+					} else {
+						echo 'Failed to open file';
+					}
 				}
 			}
 		} catch (TypeError $e) {
