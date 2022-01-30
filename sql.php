@@ -4,12 +4,15 @@ namespace SQL;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Config\Config;
+
+require_once(__DIR__ . '/config.php');
 
 class SQLException extends \Exception {}
 
 class SQL {
-	const GENERIC_ERR_MSG = 'An error occured, please try again later or contact support staff';
-	const NO_DB_CONNECTION_ERR_MSG = 'DB connection not yet established';
+	const ERR_MSG_DB_CONNECTING = 'DB connection error';
+	const ERR_MSG_NO_DB_CONNECTION = 'DB connection not yet established';
 
 	private $conn = null;
 
@@ -28,22 +31,22 @@ class SQL {
 			$this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 			$this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
-			throw new SQLException('DB connection error', 1);
+			throw new SQLException(self::ERR_MSG_DB_CONNECTING, 1);
 		}
 	}
 
 	public function return_none($query, array $params) {
 		if (!$this->get_db_connection_success()) {
-			throw new SQLException(self::NO_DB_CONNECTION_ERR_MSG, 2);
+			throw new SQLException(self::ERR_MSG_NO_DB_CONNECTION, 2);
 		}
 
 		try {
 			$sql = $this->conn->prepare($query);
 			$sql = self::bind_params($sql, $params);
-			
+
 			$sql->execute();
 		} catch (Throwable $e) {
-			throw new SQLException(self::GENERIC_ERROR_MESSAGE, 3);
+			throw new SQLException(Config::ERR_MSG_GENERIC, 3);
 		}
 	}
 

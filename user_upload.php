@@ -1,8 +1,12 @@
 #!/usr/bin/php
 <?php
 use SQL\SQL;
+use Config\Config;
+use Utils\Utils;
 
 require_once(__DIR__ . '/sql.php');
+require_once(__DIR__ . '/config.php');
+require_once(__DIR__ . '/utils.php');
 
 if ($mysqlHostIdx = array_search('-h', $argv)) {
 	$mysqlHost = $argv[$mysqlHostIdx + 1];
@@ -20,12 +24,15 @@ if (in_array('--help', $argv)) {
 	if (isset($mysqlHost) && isset($username) && isset($password)) {
 		try {
 			$sql = new SQL($mysqlHost, $username, $password);
-			
+
 			if ($sql->get_db_connection_success()) {
-				echo "Successfully connected to DB\n";
+				echo 'Successfully connected to DB';
+				if (in_array('--create_table', $argv)) {
+					Utils::create_table($sql);
+				}
 			}
 		} catch (TypeError $e) {
-			echo '[TypeError]: An error occured, please try again later or contact support staff';
+			echo '[TypeError]: ' . Config::ERR_MSG_GENERIC;
 		} catch (Throwable $e) {
 			echo '[' . get_class($e) . ', ' . $e->getCode() . ']: ' . $e->getMessage();
 		}
