@@ -34,10 +34,21 @@ if (in_array('--help', $argv)) {
 
 				if ($fileIdx = array_search('--file', $argv) + 1) {
 					$usersData = Utils::get_csv_data($argv[$fileIdx]);
-					echo print_r($usersData, true);
-					/*for ($i = 1; $i < count($usersData); $i++) {
-						$query = 'INSERT INTO users(';
-					}*/
+					for ($i = 1; $i < count($usersData); $i++) {
+						try {
+							// Could use first row of usersData to get column names, but that would be wildly insecure
+							$query = 'INSERT INTO users(name, surname, email) VALUES (?, ?, ?)';
+							$params = $usersData[$i];
+							$sql->return_none($query, $params);
+							echo 'Successfully added row: ' . implode(', ', $usersData[$i]) . "\n";
+						} catch (PDOException $e) {
+							if ($e->getCode() == 23000) {
+								echo '[' . get_class($e) . ', ' . $e->getCode() . ']: Duplicate email address at row ' . $i . "\n";
+							} else {
+								echo '[' . get_class($e) . ', ' . $e->getCode() . ']: ' . $e->getMessage() . ' at row ' . $i ."\n";
+							}
+						}
+					}
 				}
 			}
 		} catch (TypeError $e) {
