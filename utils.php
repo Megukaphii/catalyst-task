@@ -24,7 +24,6 @@ class Utils {
 	
 	public static function get_csv_data($filename) {
 		if (($csvHandle = fopen($filename, 'r')) !== FALSE) {
-			echo "Opened file\n";
 			$fileData = [];
 			while (($csvData = fgetcsv($csvHandle)) !== FALSE) {
 				$fileData[] = $csvData;
