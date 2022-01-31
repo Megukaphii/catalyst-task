@@ -43,27 +43,23 @@ if ($displayHelp) {
 			if ($sql->get_db_connection_success()) {
 				fwrite(STDOUT, "Successfully connected to DB\n");
 
-				if ($createTable) {
-					if (!$dryRun) {
-						try {
-							Utils::create_table($sql);
-						} catch (Exception $e) {
-							if (get_class($e) == 'PDOException' && $e->getCode() == "42S01") {
-								fwrite(STDOUT, '[' . get_class($e) . ', ' . $e->getCode() . "]: Table already exists\n");
-							} else {
-								fwrite(STDOUT, '[' . get_class($e) . ', ' . $e->getCode() . ']: ' . $e->getMessage() . "\n");
-							}
+				if ($createTable && !$dryRun) {
+					try {
+						Utils::create_table($sql);
+					} catch (Exception $e) {
+						if (get_class($e) == 'PDOException' && $e->getCode() == "42S01") {
+							fwrite(STDOUT, '[' . get_class($e) . ', ' . $e->getCode() . "]: Table already exists\n");
+						} else {
+							fwrite(STDOUT, '[' . get_class($e) . ', ' . $e->getCode() . ']: ' . $e->getMessage() . "\n");
 						}
 					}
-					fwrite(STDOUT, "Successfully created table\n");
 				}
 
 				if (isset($filename)) {
 					$usersData = Utils::get_csv_data($filename);
-					fwrite(STDOUT, "Opened file\n");
 					for ($i = 1; $i < count($usersData); $i++) {
 						try {
-							write_row_to_users_table($usersData, $i);
+							write_row_to_users_table($usersData, $i, $dryRun);
 						} catch (Exception $e) {
 							if (get_class($e) == 'PDOException') {
 								if ($e->getCode() == 23000) {

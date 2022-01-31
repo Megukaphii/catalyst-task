@@ -21,10 +21,12 @@ class Utils {
 			UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE);';
 		$params = [];
 		$sql->return_none($query, $params);
+		fwrite(STDOUT, "Successfully created table\n");
 	}
 	
 	public static function get_csv_data($filename) {
 		if (($csvHandle = fopen($filename, 'r')) !== FALSE) {
+			fwrite(STDOUT, "Opened file\n");
 			$fileData = [];
 			while (($csvData = fgetcsv($csvHandle)) !== FALSE) {
 				$fileData[] = $csvData;
@@ -36,7 +38,7 @@ class Utils {
 		return $fileData;
 	}
 
-	public static function write_data_to_users_table($usersData, $row) {
+	public static function write_data_to_users_table($usersData, $row, $dryRun) {
 		// Could use first row of usersData to get column names, but that would be wildly insecure
 		$query = 'INSERT INTO users(name, surname, email) VALUES (?, ?, ?)';
 		// $usersData[$i] structure is [name, surname, email]
