@@ -44,7 +44,7 @@ class Utils {
 		// $usersData[$i] structure is [name, surname, email]
 		$name = ucfirst(strtolower(trim($usersData[$row][0])));
 		$surname = ucfirst(strtolower(trim($usersData[$row][1])));
-		$email = trim($usersData[$row][2]);
+		$email = strtolower(trim($usersData[$row][2]));
 		if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 			$params = [$name, $surname, $email];
 			if (!$dryRun) {
