@@ -8,16 +8,20 @@ require_once(__DIR__ . '/sql.php');
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/utils.php');
 
-if ($mysqlHostIdx = array_search('-h', $argv) + 1) {
+if (in_array('-h', $argv)) {
+	$mysqlHostIdx = array_search('-h', $argv) + 1;
 	$mysqlHost = $argv[$mysqlHostIdx];
 }
-if ($usernameIdx = array_search('-u', $argv) + 1) {
+if (in_array('-h', $argv)) {
+	$usernameIdx = array_search('-u', $argv) + 1;
 	$username = $argv[$usernameIdx];
 }
-if ($passwordIdx = array_search('-p', $argv) + 1) {
+if (in_array('-h', $argv)) {
+	$passwordIdx = array_search('-p', $argv) + 1;
 	$password = $argv[$passwordIdx];
 }
-if ($fileIdx = array_search('--file', $argv) + 1) {
+if (in_array('-h', $argv)) {
+	$fileIdx = array_search('--file', $argv) + 1;
 	$filename = $argv[$fileIdx];
 }
 $displayHelp = false;
@@ -85,8 +89,8 @@ if ($displayHelp) {
 		isset($mysqlHost) ? null : $requiredFlags[] = 'Host name (-h flag)';
 		isset($username) ? null : $requiredFlags[] = 'Username (-u flag)';
 		isset($password) ? null : $requiredFlags[] = 'Password (-p flag)';
-		$missingStr = implode(', ', $requiredFlags) . ' are required.';
-		echo $missingStr;
+		$missingStr = implode(', ', $requiredFlags) . " are required, or use --help for usage instructions.\n";
+		fwrite(STDOUT, $missingStr);
 	}
 }
 ?>
